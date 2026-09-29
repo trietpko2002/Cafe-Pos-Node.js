@@ -480,7 +480,7 @@ Mọi đóng góp dù nhỏ đều rất có ý nghĩa và giúp dự án phát 
 
 Passionate developer building practical tools for Vietnamese F&B businesses.
 
-[![GitHub](https://img.shields.io/badge/GitHub-@trietvo-181717?style=flat-square&logo=github)](https://github.com/trietvo)
+[![GitHub](https://img.shields.io/badge/GitHub-@trietpko2002-181717?style=flat-square&logo=github)](https://github.com/trietpko2002)
 
 *"Làm ra những thứ thực sự hữu ích cho người Việt"*
 
