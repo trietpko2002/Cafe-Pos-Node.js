@@ -314,7 +314,20 @@ Copy URL này và điền vào:
 
 **CafePOS Client** là ứng dụng desktop (Windows) giúp kết nối đến server CafePOS qua LAN hoặc Cloudflare Tunnel, hiển thị POS như một ứng dụng native với cửa sổ toàn màn hình, thanh tiêu đề tuỳ chỉnh, và kết nối tự động thông minh.
 
-### Cài đặt & Chạy Client
+### 📥 Tải về / Download
+
+| Phiên bản | Nền tảng | Loại | Link tải |
+|-----------|---------|------|---------|
+| **v1.0.0** | Windows 64-bit | Portable (.zip) | [⬇️ CafePOS-Client-v1.0.0-win64.zip](https://github.com/trietpko2002/Cafe-Pos-Node.js/releases/download/v1.0.0/CafePOS-Client-v1.0.0-win64.zip) |
+| **v1.0.0** | Windows 64-bit | Installer (.exe) | [⬇️ CafePOS-Client-Setup-v1.0.0.exe](https://github.com/trietpko2002/Cafe-Pos-Node.js/releases/tag/v1.0.0) |
+
+> 💡 **Khuyến nghị dùng bản Portable (.zip)** — Giải nén và chạy thẳng, không cần cài đặt.
+>
+> Hoặc xem tất cả phiên bản tại: [**Releases →**](https://github.com/trietpko2002/Cafe-Pos-Node.js/releases)
+
+---
+
+### Cài đặt & Chạy Client (từ source)
 
 ```bash
 # Chuyển vào thư mục client
