@@ -85,13 +85,13 @@ Hệ thống có đăng nhập và hỗ trợ nhiều vai trò sử dụng như 
 
 # 🚀 Các cách chạy CafePOS
 
-Project hiện tại hỗ trợ nhiều cách chạy tùy nhu cầu: chạy source bằng Node.js, chạy nhanh bằng file `.cmd/.bat`, hoặc dùng bản Server Electron đã đóng gói.
+Project hiện tại hỗ trợ nhiều cách chạy tùy nhu cầu: chạy source bằng Node.js, chạy thủ công Node.js + Cloudflare Quick Tunnel mà không cần `.cmd/.bat`, chạy nhanh bằng file `.cmd/.bat`, hoặc dùng bản Server Electron đã đóng gói.
 
 ---
 
-## Cách 1 — Chạy Server bằng Node.js
+## Cách 1 — Chạy Server bằng Node.js / npm
 
-Đây là cách phù hợp khi phát triển, chỉnh sửa source hoặc chạy trực tiếp từ project.
+Đây là cách phù hợp khi phát triển, chỉnh sửa source hoặc chạy trực tiếp từ project. CafePOS sử dụng Node.js và quản lý dependencies/scripts bằng npm.
 
 ### Yêu cầu
 
@@ -142,6 +142,8 @@ Trong `package.json` của project, cả hai lệnh trên đều khởi động:
 tsx server.ts
 ```
 
+Vì vậy khi sử dụng bình thường, nên chạy qua **npm** (`npm run dev` hoặc `npm start`) thay vì gọi `tsx` trực tiếp.
+
 Server mặc định sử dụng cổng:
 
 ```text
@@ -156,7 +158,275 @@ http://localhost:3000
 
 ---
 
-## Cách 2 — Chạy nhanh bằng `START_SERVER.cmd`
+## Cách 2 — Chạy bằng npm + Cloudflare Quick Tunnel (không dùng `.bat/.cmd`)
+
+Đây là cách khuyến nghị khi muốn chạy CafePOS trực tiếp từ source mà không sử dụng `START_SERVER.cmd` hoặc `LAUNCH_SERVER.bat`.
+
+CafePOS là project Node.js và được quản lý bằng **npm**. Vì vậy luồng chạy chuẩn là:
+
+```text
+npm install
+npm run dev
+```
+
+hoặc:
+
+```text
+npm install
+npm start
+```
+
+Cloudflare Quick Tunnel chỉ là bước tùy chọn nếu cần truy cập CafePOS từ Internet.
+
+### Yêu cầu
+
+- Windows 10/11 64-bit.
+- Node.js 20 hoặc mới hơn.
+- npm đi kèm Node.js.
+- `cloudflared` nếu cần truy cập từ xa qua `trycloudflare.com`.
+
+Kiểm tra Node.js và npm:
+
+```bash
+node -v
+npm -v
+```
+
+### Bước 1 — Mở Terminal tại thư mục project
+
+Mở PowerShell, CMD hoặc Windows Terminal tại thư mục chứa `package.json`.
+
+Ví dụ:
+
+```powershell
+cd "D:\CODE\POS OS"
+```
+
+Thay đường dẫn trên bằng thư mục thực tế của CafePOS.
+
+### Bước 2 — Cài dependencies bằng npm
+
+Ở lần chạy đầu tiên, chạy:
+
+```bash
+npm install
+```
+
+Lệnh này đọc `package.json` và cài các package cần thiết vào thư mục:
+
+```text
+node_modules/
+```
+
+Thông thường chỉ cần chạy lại `npm install` khi:
+
+- Mới tải/copy project sang máy khác.
+- Xóa thư mục `node_modules`.
+- `package.json` hoặc dependencies thay đổi.
+- npm báo thiếu module/package.
+
+### Bước 3 — Chuẩn bị file `.env`
+
+Nếu project chưa có `.env`, tạo từ `.env.example`.
+
+PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+CMD:
+
+```cmd
+copy .env.example .env
+```
+
+Nếu `.env` đã tồn tại thì bỏ qua bước này.
+
+### Bước 4 — Chạy CafePOS bằng npm
+
+Chế độ development:
+
+```bash
+npm run dev
+```
+
+Hoặc:
+
+```bash
+npm start
+```
+
+Trong cấu hình hiện tại của project, các npm script này khởi động backend từ:
+
+```text
+tsx server.ts
+```
+
+Người dùng **không cần chạy `tsx` hoặc `npx tsx` thủ công**; nên chạy thông qua npm để đúng với cấu hình trong `package.json`.
+
+Giữ cửa sổ Terminal này mở trong suốt thời gian sử dụng CafePOS.
+
+### Bước 5 — Kiểm tra Server
+
+Trên chính máy Server, mở:
+
+```text
+http://localhost:3000
+```
+
+Nếu giao diện CafePOS xuất hiện thì Server đã chạy thành công.
+
+Port mặc định:
+
+```text
+3000
+```
+
+### Bước 6 — Truy cập từ máy khác trong LAN/Wi-Fi
+
+Trên máy Server, kiểm tra IPv4:
+
+```cmd
+ipconfig
+```
+
+Ví dụ IP máy Server là:
+
+```text
+192.168.1.5
+```
+
+thì máy POS, laptop, tablet, điện thoại hoặc máy bếp cùng mạng truy cập:
+
+```text
+http://192.168.1.5:3000
+```
+
+Nếu Client không truy cập được:
+
+- Kiểm tra CafePOS Server vẫn đang chạy.
+- Kiểm tra Server và Client cùng mạng LAN/Wi-Fi.
+- Kiểm tra đúng IPv4 của máy Server.
+- Cho phép Node.js/CafePOS qua Windows Firewall trên **Private networks**.
+- Không dùng `localhost:3000` trên máy Client.
+
+### Bước 7 — Cài Cloudflare `cloudflared` nếu cần truy cập Internet
+
+Bước này **không bắt buộc** nếu chỉ dùng CafePOS trong mạng LAN.
+
+Nếu muốn tạo URL dạng:
+
+```text
+https://xxxxx.trycloudflare.com
+```
+
+thì cần cài `cloudflared`.
+
+Có thể cài `cloudflared` vào Windows PATH hoặc đặt `cloudflared.exe` ngay trong thư mục project.
+
+Kiểm tra nếu đã có trong PATH:
+
+```bash
+cloudflared --version
+```
+
+Nếu `cloudflared.exe` nằm trong thư mục project:
+
+```powershell
+.\cloudflared.exe --version
+```
+
+### Bước 8 — Chạy Cloudflare Quick Tunnel
+
+Trước tiên phải đảm bảo CafePOS đang chạy bằng npm:
+
+```bash
+npm run dev
+```
+
+Sau đó **giữ nguyên Terminal này** và mở một Terminal thứ hai.
+
+Nếu `cloudflared` đã có trong PATH:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+Nếu `cloudflared.exe` nằm ngay trong thư mục project:
+
+```powershell
+.\cloudflared.exe tunnel --url http://localhost:3000
+```
+
+Sau khi kết nối thành công, Cloudflare sẽ hiển thị URL dạng:
+
+```text
+https://xxxxx.trycloudflare.com
+```
+
+Có thể mở URL này trên thiết bị ở ngoài mạng LAN để truy cập CafePOS.
+
+> **Lưu ý:** Quick Tunnel là tunnel tạm thời. Khi đóng tiến trình `cloudflared`, URL `trycloudflare.com` hiện tại sẽ ngừng hoạt động. Lần chạy sau có thể sinh URL khác.
+
+> **Bảo mật:** URL `trycloudflare.com` có thể truy cập từ Internet. Chỉ chia sẻ cho người được phép sử dụng hệ thống.
+
+### Tóm tắt cách chạy không dùng BAT/CMD
+
+Lần đầu trên máy mới:
+
+```bash
+npm install
+```
+
+Mỗi lần chạy CafePOS:
+
+**Terminal 1 — CafePOS Server**
+
+```bash
+npm run dev
+```
+
+hoặc:
+
+```bash
+npm start
+```
+
+**Terminal 2 — Chỉ mở khi cần Cloudflare**
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+```
+
+Sau đó truy cập:
+
+```text
+Trên máy Server:       http://localhost:3000
+Trong mạng LAN:        http://<IP-MAY-SERVER>:3000
+Qua Internet:          https://xxxxx.trycloudflare.com
+```
+
+### Các lệnh npm chính
+
+```bash
+npm install       # Cài dependencies
+npm run dev       # Chạy CafePOS ở chế độ development
+npm start         # Chạy CafePOS bằng script start
+```
+
+Không cần chạy trực tiếp:
+
+```text
+node server.ts
+npx tsx server.ts
+```
+
+trong quy trình sử dụng thông thường, vì việc khởi động đã được định nghĩa trong npm scripts của project.
+
+---
+
+## Cách 3 — Chạy nhanh bằng `START_SERVER.cmd`
 
 Đây là cách thuận tiện nhất khi chạy project trên Windows mà không muốn gõ lệnh thủ công.
 
@@ -201,7 +471,7 @@ là có thể chạy hệ thống.
 
 ---
 
-## Cách 3 — Chạy bằng bản POS OS Server Electron
+## Cách 4 — Chạy bằng bản POS OS Server Electron
 
 Trong project có thư mục:
 
@@ -400,22 +670,34 @@ Client ở ngoài mạng LAN có thể mở URL đó bằng trình duyệt để
 
 ## 1. Khởi động máy Server
 
-Chọn một trong các cách:
+Nếu chạy source bằng Node.js/npm, dùng:
 
-```text
-START_SERVER.cmd
+```bash
+npm run dev
 ```
 
 hoặc:
 
 ```bash
-npm run dev
+npm start
+```
+
+Nếu muốn dùng launcher Windows thì chạy:
+
+```text
+START_SERVER.cmd
 ```
 
 hoặc chạy bản đóng gói:
 
 ```text
 POS OS Server.exe
+```
+
+Nếu chạy Node.js thủ công và cần truy cập từ Internet, mở Terminal thứ hai:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
 ```
 
 ## 2. Kết nối các Client
@@ -524,6 +806,7 @@ POS OS/
 ├── .env.example
 ├── START_SERVER.cmd           # Chạy nhanh trên Windows
 ├── LAUNCH_SERVER.bat          # Launcher đầy đủ Local/LAN/Cloudflare
+├── cloudflared.exe            # Tùy chọn: chạy Quick Tunnel thủ công trên Windows
 ├── data/
 │   └── cafepos.db             # Database
 ├── dist/                      # Frontend đã build
@@ -583,9 +866,12 @@ CafePOS được phát triển với mục tiêu xây dựng một giải pháp 
 ## 📄 Ghi chú
 
 - Port mặc định của CafePOS Server là `3000`.
+- Project sử dụng npm để cài dependencies và chạy các script Node.js. Trên máy mới, chạy `npm install` trước khi `npm run dev` hoặc `npm start`.
 - Database của project nằm trong thư mục `data/` khi chạy source; bản Electron có vùng dữ liệu riêng của ứng dụng.
 - Không nên mở hai Server CafePOS cùng lúc trên cùng port `3000`.
 - IP LAN có thể thay đổi sau khi router hoặc máy Server khởi động lại. Nếu Client mất kết nối, hãy kiểm tra lại IP Server.
+- Nếu chạy Cloudflare Quick Tunnel thủ công, phải giữ cả tiến trình Node.js và `cloudflared` hoạt động.
+- URL `trycloudflare.com` là URL tạm thời và có thể thay đổi sau mỗi lần khởi động lại tunnel.
 - Nội dung và cấu trúc có thể tiếp tục thay đổi ở các phiên bản sau.
 
 ---
